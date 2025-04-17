@@ -14,12 +14,10 @@ temp_df.columns = temp_df.columns.str.lower().str.strip()
 zip_df = pd.read_csv(r"C:\Users\rigna_nwlmn\Downloads\ai case study\ML-Location-Case-Study\data\us_zip_to_state_full.csv")
 
 # Encode all state names
-
 le = LabelEncoder()
 temp_df['state_encoded'] = le.fit_transform(temp_df['state'])
 
 # Average temp per state across all years/months
-
 avg_state_temp_df = temp_df.groupby(['state', 'state_encoded'])['average_temp'].mean().reset_index()
 
 X = avg_state_temp_df[['state_encoded']]
@@ -29,7 +27,6 @@ model = RandomForestRegressor(n_estimators=100, random_state=42)
 model.fit(X, y)
 
 # Abbreviation w/ all states name's mapped
-
 state_abbr_to_name = {
     "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas",
     "CA": "California", "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware",
@@ -47,7 +44,6 @@ state_abbr_to_name = {
 }
 
 # Get state name from ZIP code
-
 def get_state_from_zip(zip_code):
     match = zip_df[zip_df['Zipcode'] == int(zip_code)]
     if not match.empty:
@@ -55,7 +51,6 @@ def get_state_from_zip(zip_code):
     return None
 
 # Predict avg temp per state using ZIP code 
-
 def predict_temp_by_zip(zip_code):
     abbr = get_state_from_zip(zip_code)
     if not abbr:
