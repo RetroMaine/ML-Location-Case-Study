@@ -77,4 +77,4 @@ def predict_temp_by_zip(zip_code):
     return f"Predicted average temperature for ZIP code {zip_code} ({state_name}): {prediction:.2f} degrees fahrenheit (based on long-term average)"
 
 # Example usage
-print(predict_temp_by_zip(78613))  # Texas zipcode
+print(predict_temp_by_zip(75104))  # Texas zipcode
