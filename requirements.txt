@@ -1,0 +1,8 @@
+Django>=3.2
+djangorestframework
+django-cors-headers
+torch
+scikit-learn
+pandas
+uszipcode
+joblib
