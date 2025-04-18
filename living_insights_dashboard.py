@@ -1,5 +1,3 @@
-# living_insights_dashboard.py
-
 import streamlit as st
 import xgboost
 from streamlit_folium import st_folium
@@ -8,6 +6,7 @@ from geopy.geocoders import Nominatim
 from housing_model import predict_price_by_zip
 from crime_model import predict_crime_rate_by_zip
 from infrastructure_model import predict_infa_rate_by_zip
+from weather_model import predict_temp_by_zip
 
 # === FIRST Streamlit command ===
 st.set_page_config(page_title="Living Insights", layout="wide")
@@ -57,17 +56,21 @@ zip_code = st.session_state["map_zip"]
 housing_pred = None
 crime_pred   = None
 infa_pred = None
+weather_pred = None
 
 if zip_code and zip_code.isdigit():
     housing_pred = predict_price_by_zip(zip_code)
     if housing_pred is None:
         st.warning(f"No housing data available for ZIP code {zip_code}.")
-    crime_pred = 2 #predict_crime_rate_by_zip(zip_code)
+    crime_pred = predict_crime_rate_by_zip(zip_code)
     if crime_pred is None:
         st.warning(f"No crime data available for ZIP code {zip_code}.")
     infa_pred = predict_infa_rate_by_zip(zip_code)
     if infa_pred is None:
         st.warning(f"No infrastructure data available for ZIP code {zip_code}.")
+    weather_pred = predict_temp_by_zip(zip_code)
+    if weather_pred is None:
+        st.warning(f"No temperature data available for ZIP code {zip_code}.")
     
 
 # === DASHBOARD UI ===
@@ -85,8 +88,9 @@ with col1:
 
     st.markdown(f"""
     <div class="metric-card">
-        <h3>Weather Patterns</h3>
-        <p>{zip_code if zip_code else 'Enter a ZIP code to get prediction'}</p>
+        <h3>Weather Temperatures</h3>
+        <p>ZIP: {zip_code if zip_code else 'Not Provided'}</p>
+        <p><b>{f"{weather_pred:,.2f}" if weather_pred is not None else 'No prediction available'}</b></p>
     </div>
     """, unsafe_allow_html=True)
 
