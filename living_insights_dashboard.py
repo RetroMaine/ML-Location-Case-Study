@@ -90,7 +90,7 @@ with col1:
     <div class="metric-card">
         <h3>Weather Temperatures</h3>
         <p>ZIP: {zip_code if zip_code else 'Not Provided'}</p>
-        <p><b>{f"{weather_pred:,.2f}" if weather_pred is not None else 'No prediction available'}</b></p>
+        <p><b>{f"{weather_pred:,.2f} degrees fahrenheit on average" if weather_pred is not None else 'No prediction available'}</b></p>
     </div>
     """, unsafe_allow_html=True)
 
