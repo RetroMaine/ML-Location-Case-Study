@@ -1,0 +1,91 @@
+import streamlit as st
+from streamlit_folium import st_folium
+import folium
+from geopy.geocoders import Nominatim
+from housing_model import predict_price_by_zip
+
+# === FIRST Streamlit command ===
+st.set_page_config(page_title="Living Insights", layout="wide")
+
+# === SESSION INIT ===
+if "map_zip" not in st.session_state:
+    st.session_state["map_zip"] = ""
+
+# === CUSTOM STYLING ===
+st.markdown("""
+<style>
+    .stApp { background-color: #f3f4f6; color: black; }
+    .metric-card {
+        background-color: #f8f8f8;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        color: black;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# === SIDEBAR MAP ===
+st.sidebar.markdown("# Living Insights")
+st.sidebar.markdown("### 📍 Click Location on Map")
+m = folium.Map(location=[32.7767, -96.7970], zoom_start=10)
+st.sidebar.markdown("<div style='height:250px;'>", unsafe_allow_html=True)
+map_data = st_folium(m, height=250, width=250, returned_objects=["last_clicked"], key="sidebar_map")
+st.sidebar.markdown("</div>", unsafe_allow_html=True)
+
+# === ZIP CODE HANDLING ===
+if map_data and map_data.get("last_clicked"):
+    lat = map_data["last_clicked"]["lat"]
+    lng = map_data["last_clicked"]["lng"]
+    geolocator = Nominatim(user_agent="zip_finder")
+    location = geolocator.reverse((lat, lng), language="en")
+    if location and "postcode" in location.raw["address"]:
+        st.session_state["map_zip"] = location.raw["address"]["postcode"]
+
+input_zip = st.text_input("Enter Zip Code", value=st.session_state["map_zip"], placeholder="e.g. 75080")
+if input_zip != st.session_state["map_zip"]:
+    st.session_state["map_zip"] = input_zip
+
+zip_code = st.session_state["map_zip"]
+
+# === MODEL PREDICTION ===
+prediction = None
+if zip_code and zip_code.isdigit():
+    prediction = predict_price_by_zip(zip_code)
+    if prediction is None:
+        st.warning(f"No data available for ZIP code {zip_code}.")
+
+# === DASHBOARD UI ===
+st.markdown("---")
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown(f"""
+    <div class="metric-card">
+        <h3>Housing Prices</h3>
+        <p>ZIP: {zip_code if zip_code else 'Not provided'}</p>
+        <p><b>{f"${prediction:,.2f}" if prediction else 'No prediction available'}</b></p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div class="metric-card">
+        <h3>Weather Patterns</h3>
+        <p>{zip_code if zip_code else 'Enter a ZIP code to get prediction'}</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown(f"""
+    <div class="metric-card">
+        <h3>Crime Rates</h3>
+        <p>{zip_code if zip_code else 'Enter a ZIP code to get prediction'}</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div class="metric-card">
+        <h3>Infrastructure Quality</h3>
+        <p>{zip_code if zip_code else 'Enter a ZIP code to get prediction'}</p>
+    </div>
+    """, unsafe_allow_html=True)
