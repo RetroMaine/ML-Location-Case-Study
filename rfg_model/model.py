@@ -1,8 +1,12 @@
 import pandas as pd
+import joblib
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import LabelEncoder
 import warnings
 warnings.filterwarnings("ignore")
+
+MODEL_PATH = "weather_model.pkl"
+
 
 # Loading datasets
 
@@ -49,6 +53,9 @@ def get_state_from_zip(zip_code):
     if not match.empty:
         return match.iloc[0]['State']
     return None
+
+
+joblib.dump(model, MODEL_PATH)
 
 # Predict avg temp per state using ZIP code 
 def predict_temp_by_zip(zip_code):
